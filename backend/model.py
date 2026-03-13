@@ -1,5 +1,6 @@
 from config import db
 import datetime
+from datetime import timezone
 
 class RoadType(db.Model):
     __tablename__ = "roadtype"
@@ -46,7 +47,7 @@ class Bottleneck(db.Model):
     priority_level = db.Column(db.Integer, nullable=False)
     road_type_fk = db.Column(db.String(50), db.ForeignKey("roadtype.road_type"), nullable=True)
     typical_volume = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.datetime.now(timezone.utc), nullable=False)
  
     road_type_rel = db.relationship("RoadType", back_populates="bottlenecks")
     adjacency_from = db.relationship("BottleneckAdjacency", foreign_keys="BottleneckAdjacency.from_bottleneck_id", back_populates="from_bottleneck")
@@ -238,7 +239,7 @@ class Incident(db.Model):
  
     incident_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     bottleneck_id_fk = db.Column(db.Integer, db.ForeignKey("bottleneck.bottleneck_id"), nullable=True)
-    report_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    report_time = db.Column(db.DateTime, nullable=False, default=lambda: datetime.datetime.now(timezone.utc))
     severity = db.Column(
         db.Enum("critical", "major", "minor", "informational", name="incident_severity"),
         nullable=False,
@@ -269,7 +270,7 @@ class OptimizationRun(db.Model):
  
     ga_run_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     input_data_hash = db.Column(db.String(255), nullable=False)
-    run_timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    run_timestamp = db.Column(db.DateTime, default=lambda: datetime.datetime.now(timezone.utc), nullable=False)
     best_fitness = db.Column(db.Numeric(10, 4), nullable=False)
     convergence_gen = db.Column(db.Integer, nullable=False)
  
